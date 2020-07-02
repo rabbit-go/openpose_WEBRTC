@@ -8,10 +8,15 @@ const contentHeight = 600;
 bindPage();
 
 async function bindPage() {
-    const net = await posenet.load(); // posenet‚ÌŒÄ‚Ño‚µ
+    const net = await posenet.load({
+        architecture: 'ResNet50',
+        outputStride: 32,
+        inputResolution: { width: 257, height: 200 },
+        quantBytes: 2
+      });
     let video;
     try {
-        video = await loadVideo(); // video‘®«‚ğƒ[ƒh
+        video = await loadVideo(); // videoå±æ€§ã‚’ãƒ­ãƒ¼ãƒ‰
     } catch(e) {
         console.error(e);
         return;
@@ -19,15 +24,15 @@ async function bindPage() {
     detectPoseInRealTime(video, net);
 }
 
-// video‘®«‚Ìƒ[ƒh
+// videoå±æ€§ã®ãƒ­ãƒ¼ãƒ‰
 async function loadVideo() {
-    const video = await setupCamera(); // ƒJƒƒ‰‚ÌƒZƒbƒgƒAƒbƒv
+    const video = await setupCamera(); // ã‚«ãƒ¡ãƒ©ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
     video.play();
     return video;
 }
 
-// ƒJƒƒ‰‚ÌƒZƒbƒgƒAƒbƒv
-// video‘®«‚©‚çƒXƒgƒŠ[ƒ€‚ğæ“¾‚·‚é
+// ã‚«ãƒ¡ãƒ©ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+// videoå±æ€§ã‹ã‚‰ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’å–å¾—ã™ã‚‹
 async function setupCamera() {
     const video = document.getElementById('video');
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -48,8 +53,8 @@ async function setupCamera() {
     }
 }
 
-// æ“¾‚µ‚½ƒXƒgƒŠ[ƒ€‚ğestimateSinglePose()‚É“n‚µ‚Äp¨—\‘ª‚ğÀs
-// requestAnimationFrame‚É‚æ‚Á‚ÄƒtƒŒ[ƒ€‚ğÄ•`‰æ‚µ‘±‚¯‚é
+// å–å¾—ã—ãŸã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’estimateSinglePose()ã«æ¸¡ã—ã¦å§¿å‹¢äºˆæ¸¬ã‚’å®Ÿè¡Œ
+// requestAnimationFrameã«ã‚ˆã£ã¦ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’å†æç”»ã—ç¶šã‘ã‚‹
 function detectPoseInRealTime(video, net) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -64,13 +69,13 @@ function detectPoseInRealTime(video, net) {
         ctx.clearRect(0, 0, contentWidth,contentHeight);
 
         ctx.save();
-        ctx.scale(-1, 1);
-        ctx.translate(-contentWidth, 0);
+        ctx.scale(1, 1);
+        ctx.translate(contentWidth, 0);
         ctx.drawImage(video, 0, 0, contentWidth, contentHeight);
         ctx.restore();
 
         poses.forEach(({ score, keypoints }) => {
-            // keypoints[9]‚É‚Í¶èAkeypoints[10]‚É‚Í‰Eè‚Ì—\‘ªŒ‹‰Ê‚ªŠi”[‚³‚ê‚Ä‚¢‚é 
+            // keypoints[9]ã«ã¯å·¦æ‰‹ã€keypoints[10]ã«ã¯å³æ‰‹ã®äºˆæ¸¬çµæœãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ 
             drawWristPoint(keypoints[9],ctx);
             drawWristPoint(keypoints[10],ctx);
         });
@@ -82,7 +87,7 @@ function detectPoseInRealTime(video, net) {
     poseDetectionFrame();
 }
 
-// —^‚¦‚ç‚ê‚½Keypoint‚ğcanvas‚É•`‰æ‚·‚é
+// ä¸ãˆã‚‰ã‚ŒãŸKeypointã‚’canvasã«æç”»ã™ã‚‹
 function drawWristPoint(wrist,ctx){
     ctx.beginPath();
     ctx.arc(wrist.position.x , wrist.position.y, 3, 0, 2 * Math.PI);
