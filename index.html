@@ -3,12 +3,17 @@
   <head>
     <script src="https://unpkg.com/@tensorflow/tfjs"></script>
     <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
+    <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
   </head>
   <body>
+    <label>APIKey：<input type="text",name= "apiKey"></label>
+    <button type="button" id="createconnection">CreateConnection</button><br>
     <video id="video" width="800px" height="600px" autoplay="1" style="position:absolute;"></video>
     <canvas id="canvas" width="800px" height="600px" style="position:absolute;"></canvas>
     <div class="ball"></div>
 </body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
-  <script src="main.js"></script>
+  <script src="js/skyway.js"></script>
+  <script src="js/webcamera.js"></script>
+  <script src="js/main.js"></script>
 </html>

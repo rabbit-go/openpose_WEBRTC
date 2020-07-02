@@ -4,7 +4,7 @@ const flipHorizontal = false;
 const stats = new Stats();
 const contentWidth = 800;
 const contentHeight = 600;
-
+let　dataconnection;
 bindPage();
 
 async function bindPage() {
@@ -22,43 +22,26 @@ async function bindPage() {
         return;
     }
     detectPoseInRealTime(video, net);
+    //WebRTCZone
+    const api = document.getElementById('apiKey');
+    const connection = document.getElementById('createconnection');
+    connection.onclick = function()
+    {
+        const peer = createPeer(api.textContent);
+        dataconnection = createDataConnection(peer);
+    };
+    
+
 }
 
-// video属性のロード
-async function loadVideo() {
-    const video = await setupCamera(); // カメラのセットアップ
-    video.play();
-    return video;
-}
 
-// カメラのセットアップ
-// video属性からストリームを取得する
-async function setupCamera() {
-    const video = document.getElementById('video');
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            'audio': false,
-            'video': true});
-        video.srcObject = stream;
-
-        return new Promise(resolve => {
-            video.onloadedmetadata = () => {
-                resolve(video);
-            };
-        });
-    } else {
-        const errorMessage = "This browser does not support video capture, or this device does not have a camera";
-        alert(errorMessage);
-        return Promise.reject(errorMessage);
-    }
-}
 
 // 取得したストリームをestimateSinglePose()に渡して姿勢予測を実行
 // requestAnimationFrameによってフレームを再描画し続ける
 function detectPoseInRealTime(video, net) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const flipHorizontal = true; // since images are being fed from a webcam
+    const flipHorizontal = false; // since images are being fed from a webcam
 
     async function poseDetectionFrame() {
         stats.begin();
@@ -69,15 +52,17 @@ function detectPoseInRealTime(video, net) {
         ctx.clearRect(0, 0, contentWidth,contentHeight);
 
         ctx.save();
-        ctx.scale(1, 1);
-        ctx.translate(contentWidth, 0);
+        ctx.scale(-1, 1);
+        ctx.translate(-contentWidth, 0);
         ctx.drawImage(video, 0, 0, contentWidth, contentHeight);
         ctx.restore();
-
+        dataConnection.on('open', () => {
+            dataConnection.send(poses);
+          });
         poses.forEach(({ score, keypoints }) => {
             // keypoints[9]には左手、keypoints[10]には右手の予測結果が格納されている 
-            drawWristPoint(keypoints[9],ctx);
-            drawWristPoint(keypoints[10],ctx);
+            console.log(keypoints[9]);
+            console.log(keypoints[10]);
         });
 
         stats.end();
