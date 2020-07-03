@@ -33,8 +33,8 @@ async function bindPage() {
     const dataconnection = document.getElementById('dataconnection');
     dataconnection.onclick = function()
     {
-        const dataconnection = createDataConnection(peer);
-        detectPoseInRealTime(video, net,dataconnection);
+        const dataconnection2 = createDataConnection(peer);
+        detectPoseInRealTime(video, net,dataconnection2);
     };
 
 }

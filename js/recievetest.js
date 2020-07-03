@@ -7,9 +7,6 @@ connection.onclick = function()
     connection_local = createPeer(api.value);
     //createDataConnection(peer);
     //dataconnection = createDataConnection(peer);
-    peer.on('data', data => {
-        console.log(data);
-      });
 };
 dataconnection.onclick = function()
 {
