@@ -4,7 +4,7 @@ const flipHorizontal = false;
 const stats = new Stats();
 const contentWidth = 800;
 const contentHeight = 600;
-let　dataconnection;
+
 bindPage();
 
 async function bindPage() {
@@ -21,14 +21,15 @@ async function bindPage() {
         console.error(e);
         return;
     }
-    detectPoseInRealTime(video, net);
+    
     //WebRTCZone
     const api = document.getElementById('apiKey');
     const connection = document.getElementById('createconnection');
     connection.onclick = function()
     {
-        const peer = createPeer(api.textContent);
-        dataconnection = createDataConnection(peer);
+        const peer = createPeer(api.value);
+        const dataconnection = createDataConnection(peer);
+        detectPoseInRealTime(video, net,dataconnection);
     };
     
 
@@ -38,7 +39,7 @@ async function bindPage() {
 
 // 取得したストリームをestimateSinglePose()に渡して姿勢予測を実行
 // requestAnimationFrameによってフレームを再描画し続ける
-function detectPoseInRealTime(video, net) {
+function detectPoseInRealTime(video, net,dataConnection) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const flipHorizontal = false; // since images are being fed from a webcam
@@ -69,7 +70,7 @@ function detectPoseInRealTime(video, net) {
 
         requestAnimationFrame(poseDetectionFrame);
     }
-    poseDetectionFrame();
+    poseDetectionFrame(dataConnection);
 }
 
 // 与えられたKeypointをcanvasに描画する
