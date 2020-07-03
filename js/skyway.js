@@ -11,7 +11,7 @@ function createPeer(apikey){
       });
       peer.on('call', mediaConnection => {
         // MediaStreamで応答する
-        mediaConnection.answer(mediaStream);
+      //  mediaConnection.answer(mediaStream);
       });
       
       return peer;
