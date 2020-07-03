@@ -6,6 +6,9 @@ function createPeer(apikey){
           iceTransportPolicy: 'relay',
         },
       });
+      peer.on('open', mediaConnection => {
+        room = peer.joinRoom(roomID);
+      });
       peer.on('call', mediaConnection => {
         // MediaStreamで応答する
         mediaConnection.answer(mediaStream);
