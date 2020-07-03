@@ -25,13 +25,17 @@ async function bindPage() {
     //WebRTCZone
     const api = document.getElementById('apiKey');
     const connection = document.getElementById('createconnection');
+    var peer;
     connection.onclick = function()
     {
-        const peer = createPeer(api.value);
+         peer = createPeer(api.value);
+    };
+    const dataconnection = document.getElementById('dataconnection');
+    dataconnection.onclick = function()
+    {
         const dataconnection = createDataConnection(peer);
         detectPoseInRealTime(video, net,dataconnection);
     };
-    
 
 }
 
