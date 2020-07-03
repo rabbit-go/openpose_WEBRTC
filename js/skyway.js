@@ -1,6 +1,6 @@
 const roomID = 'room';
 function createPeer(apikey){
-    const peer = new Peer(roomID,{
+    const peer = new Peer({
         key: apikey,
         config: {
           iceTransportPolicy: 'relay',
