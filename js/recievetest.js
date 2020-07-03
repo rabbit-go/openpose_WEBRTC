@@ -1,4 +1,4 @@
-const api = document.getElementById('apiKey').value;
+const api = document.getElementById('apiKey');
 const connection = document.getElementById('createconnection');
 connection.onclick = function()
 {
