@@ -3,6 +3,6 @@ const connection = document.getElementById('createconnection');
 connection.onclick = function()
 {
     const peer = createPeer(api.textContent);
-    createDataConnection(peer);
+    //createDataConnection(peer);
     //dataconnection = createDataConnection(peer);
 };
