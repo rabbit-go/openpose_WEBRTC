@@ -49,6 +49,8 @@ function detectPoseInRealTime(video, net) {
         ctx.restore();
         
         poses.forEach(({ score, keypoints }) => {
+            room.send(keypoints[9]);
+            room.send(keypoints[10]);
             // keypoints[9]には左手、keypoints[10]には右手の予測結果が格納されている 
             console.log(keypoints[9]);
             console.log(keypoints[10]);
