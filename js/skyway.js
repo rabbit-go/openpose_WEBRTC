@@ -57,7 +57,7 @@ const Peer = window.Peer;
       mode: getRoomModeByHash(),
       stream: localStream,
     });
-
+    window._room_ = room;
     room.once('open', () => {
       messages.textContent += '=== You joined ===\n';
     });
