@@ -16,7 +16,7 @@ async function bindPage() {
       });
     let video;
     try {
-        video = await loadVideo(); // video属性をロード
+        video = document.getElementById('video');// video属性をロード
     } catch(e) {
         console.error(e);
         return;
