@@ -1,19 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SkyWay - Room example</title>
   </head>
   <body>
-    
-    <label>APIKey：<input type="text" id= "apiKey"></label>
-    <button type="button" id="createconnection">CreateConnection</button><br>
-    <button type="button" id="dataconnection">dataconnection</button><br>
-    <button type="button" id="call">Call</button><br>
-    <video id="video" width="800px" height="600px" autoplay="1" style="position:absolute;"></video>
-    <canvas id="canvas" width="800px" height="600px" style="position:absolute;"></canvas>
-    <div class="ball"></div>
-</body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
-  <script src="js/skyway.js"></script>
-  <script src="js/recievetest.js"></script>
+    <div class="container">
+      <h1 class="heading">Room example</h1>
+      <p class="note">
+        Change Room mode (before join in a room):
+        <a href="#">mesh</a> / <a href="#sfu">sfu</a>
+      </p>
+      <div class="room">
+        <div>
+          <video id="js-local-stream" width="800px" height="600px" style="position:absolute;"></video>
+          <canvas id="canvas" width="800px" height="600px" style="position:absolute;"></canvas>
+          <span id="js-room-mode"></span>:
+          <input type="text" placeholder="Room Name" id="js-room-id">
+          <button id="js-join-trigger">Join</button>
+          <button id="js-leave-trigger">Leave</button>
+        </div>
+
+        <div class="remote-streams" id="js-remote-streams"></div>
+
+        <div>
+          <pre class="messages" id="js-messages"></pre>
+          <input type="text" id="js-local-text">
+          <button id="js-send-trigger">Send</button>
+        </div>
+      </div>
+      <p class="meta" id="js-meta"></p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
+    <script src="sharedKey/key.js"></script>
+    <script src="js/skyway.js"></script>
+  </body>
 </html>
+
+</html>
+
+
+
