@@ -21,21 +21,7 @@ async function bindPage() {
         console.error(e);
         return;
     }
-    
-    //WebRTCZone
-    const api = document.getElementById('apiKey');
-    const connection = document.getElementById('createconnection');
-    var peer;
-    connection.onclick = function()
-    {
-         peer = createPeer(api.value);
-    };
-    const dataconnection = document.getElementById('dataconnection');
-    dataconnection.onclick = function()
-    {
-        const dataconnection2 = createDataConnection(peer);
-        detectPoseInRealTime(video, net,dataconnection2);
-    };
+    detectPoseInRealTime(video,net);
 
 }
 
@@ -43,7 +29,7 @@ async function bindPage() {
 
 // 取得したストリームをestimateSinglePose()に渡して姿勢予測を実行
 // requestAnimationFrameによってフレームを再描画し続ける
-function detectPoseInRealTime(video, net,dataConnection) {
+function detectPoseInRealTime(video, net) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const flipHorizontal = false; // since images are being fed from a webcam
@@ -61,9 +47,7 @@ function detectPoseInRealTime(video, net,dataConnection) {
         ctx.translate(-contentWidth, 0);
         ctx.drawImage(video, 0, 0, contentWidth, contentHeight);
         ctx.restore();
-        dataConnection.on('open', () => {
-            dataConnection.send(poses);
-          });
+        
         poses.forEach(({ score, keypoints }) => {
             // keypoints[9]には左手、keypoints[10]には右手の予測結果が格納されている 
             console.log(keypoints[9]);
@@ -74,7 +58,7 @@ function detectPoseInRealTime(video, net,dataConnection) {
 
         requestAnimationFrame(poseDetectionFrame);
     }
-    poseDetectionFrame(dataConnection);
+    poseDetectionFrame();
 }
 
 // 与えられたKeypointをcanvasに描画する
