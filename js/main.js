@@ -21,7 +21,10 @@ async function bindPage() {
         console.error(e);
         return;
     }
-    detectPoseInRealTime(video,net);
+    video.addEventListener('loadeddata', (event) => {
+        detectPoseInRealTime(video,net);
+      });
+    
 
 }
 
