@@ -6,6 +6,7 @@
     <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SkyWay - Room example</title>
+    <link rel="stylesheet" href="sharedKey/style.css">
   </head>
   <body>
     <div class="container">
@@ -16,8 +17,7 @@
       </p>
       <div class="room">
         <div>
-          <video id="js-local-stream" width="800px" height="600px" style="position:absolute;"></video>
-          <canvas id="canvas" width="800px" height="600px" style="position:absolute;"></canvas>
+          <video id="js-local-stream" ></video>
           <span id="js-room-mode"></span>:
           <input type="text" placeholder="Room Name" id="js-room-id">
           <button id="js-join-trigger">Join</button>
