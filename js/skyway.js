@@ -1,120 +1,150 @@
-const Peer = window.Peer;
+let peer = null;
+let existingConn = null;
 
-(async function main() {
-  const localVideo = document.getElementById('js-local-stream');
-  const joinTrigger = document.getElementById('js-join-trigger');
-  const leaveTrigger = document.getElementById('js-leave-trigger');
-  const remoteVideos = document.getElementById('js-remote-streams');
-  const roomId = document.getElementById('js-room-id');
-  const roomMode = document.getElementById('js-room-mode');
-  const localText = document.getElementById('js-local-text');
-  const sendTrigger = document.getElementById('js-send-trigger');
-  const messages = document.getElementById('js-messages');
-  const meta = document.getElementById('js-meta');
-  const sdkSrc = document.querySelector('script[src*=skyway]');
+//初期化(cssでもできるはず)
+SetupMakeConnUI();
 
-  meta.innerText = `
-    UA: ${navigator.userAgent}
-    SDK: ${sdkSrc ? sdkSrc.src : 'unknown'}
-  `.trim();
+function GetPeerId(id) {
+    //ボタンをすべて消す　PeerIDがサーバーに残ってしまい初期化ができない
+    $('#peerid-ui').hide();
 
-  const getRoomModeByHash = () => (location.hash === '#sfu' ? 'sfu' : 'mesh');
+    peer = new Peer(id, {
+        // Set API key for cloud server (you don't need this if you're running your
+        // own.
+        key: '6cee6718-08d3-4ce7-93a9-237ecd4601bb',
+        // Set highest debug level (log everything!).
+        debug: 3,
+    });
 
-  roomMode.textContent = getRoomModeByHash();
-  window.addEventListener(
-    'hashchange',
-    () => (roomMode.textContent = getRoomModeByHash())
-  );
+    // Show this peer's ID.
+    peer.on('open', id => {
+        $('#my-id').text(id);
+    });
 
-  const localStream = await navigator.mediaDevices
-    .getUserMedia({
-      audio: true,
-      video: true,
-    })
-    .catch(console.error);
+    //着信処理
+    peer.on('connection', Connect);
 
-  // Render local stream
-  localVideo.muted = true;
-  localVideo.srcObject = localStream;
-  localVideo.playsInline = true;
-  await localVideo.play().catch(console.error);
+    //エラー
+    peer.on('error', err => {
+        $('#console').text(err);
+        SetupMakeConnUI();
+    });
 
-  // eslint-disable-next-line require-atomic-updates
-  const peer = (window.peer = new Peer({
-    key: window.__SKYWAY_KEY__,
-    debug: 3,
-  }));
+}
 
-  // Register join handler
-  joinTrigger.addEventListener('click', () => {
-    // Note that you need to ensure the peer has connected to signaling server
-    // before using methods of peer instance.
-    if (!peer.open) {
-      return;
+//ID選択
+function UnityGetPeerId(id, theirId) {
+    GetPeerId(id);
+    $('#their-id').val(theirId);
+}
+
+$('#twincam').on('click', () => {
+    GetPeerId("twincam");
+    $('#their-id').val("user");
+});
+
+$('#user').on('click', () => {
+    GetPeerId("user");
+    $('#their-id').val("twincam");
+});
+
+$('#sender').on('click', () => {
+    GetPeerId("sender");
+    $('#their-id').val("reciever");
+});
+
+$('#reciever').on('click', () => {
+    GetPeerId("reciever");
+    $('#their-id').val("sender");
+});
+
+// Connect to a peer
+$('#connect').on('submit', e => {
+    e.preventDefault();
+    //接続
+    const conn = peer.connect($('#their-id').val());
+    Connect(conn);
+});
+
+function UnityConnect(theirId) {
+    //接続
+    const conn = peer.connect(theirId);
+    Connect(conn);
+}
+
+//切断
+$('#close').on('click', () => {
+    existingConn.close();
+});
+
+function UnityClose() {
+    existingConn.close();
+}
+
+//送信ボタン
+$('#send').on('submit', e => {
+    e.preventDefault();
+
+    DataSend($('#message').val());
+
+    //テキストボックスをクリア
+    $('#message').val('');
+    //テキストボックスを選択
+    $('#message').focus();
+});
+
+//リロード
+$('#reload').on('click', () => {
+    location.reload(true);
+});
+window.DataSend = DataSend;
+//送信処理
+function DataSend(msg) {
+    existingConn.send(msg);
+    $("#resultSend").text(msg);
+}
+
+//接続イベントの管理
+function Connect(conn) {
+    if (existingConn) {
+        existingConn.close();
     }
+    SetupEndConnUI();
 
-    const room = peer.joinRoom(roomId.value, {
-      mode: getRoomModeByHash(),
-      stream: localStream,
-    });
-    window._room_ = room;
-    room.once('open', () => {
-      messages.textContent += '=== You joined ===\n';
-    });
-    room.on('peerJoin', peerId => {
-      messages.textContent += `=== ${peerId} joined ===\n`;
+    //接続相手を保持
+    existingConn = conn;
+
+    //接続が完了した場合のイベント
+    conn.on('open', () => {
+        $('#connected-id').text(conn.remoteId);
     });
 
-    // Render remote stream for new peer join in the room
-    room.on('stream', async stream => {
-      const newVideo = document.createElement('video');
-      newVideo.srcObject = stream;
-      newVideo.playsInline = true;
-      // mark peerId to find it later at peerLeave event
-      newVideo.setAttribute('data-peer-id', stream.peerId);
-      remoteVideos.append(newVideo);
-      await newVideo.play().catch(console.error);
+    //受信
+    conn.on('data', data => {
+        DataRecieve(data);
+        $('#resultRecieve').text(data);
     });
 
-    room.on('data', ({ data, src }) => {
-      // Show a message sent to the room and who sent
-      messages.textContent += `${src}: ${data}\n`;
+    //相手が切断したとき
+    conn.on('close', () => {
+        $('#console').text(conn.remoteId + ' has left the chat');
+        SetupMakeConnUI();
     });
+}
 
-    // for closing room members
-    room.on('peerLeave', peerId => {
-      const remoteVideo = remoteVideos.querySelector(
-        `[data-peer-id="${peerId}"]`
-      );
-      remoteVideo.srcObject.getTracks().forEach(track => track.stop());
-      remoteVideo.srcObject = null;
-      remoteVideo.remove();
+//受信処理
+function DataRecieve(data) {
+}
 
-      messages.textContent += `=== ${peerId} left ===\n`;
-    });
+//UI操作
+function SetupMakeConnUI() {
+    $('#connect').show();
+    $('#connected-ui').hide();
+}
 
-    // for closing myself
-    room.once('close', () => {
-      sendTrigger.removeEventListener('click', onClickSend);
-      messages.textContent += '== You left ===\n';
-      Array.from(remoteVideos.children).forEach(remoteVideo => {
-        remoteVideo.srcObject.getTracks().forEach(track => track.stop());
-        remoteVideo.srcObject = null;
-        remoteVideo.remove();
-      });
-    });
+function SetupEndConnUI() {
+    $('#connect').hide();
+    $('#connected-ui').show();
 
-    sendTrigger.addEventListener('click', onClickSend);
-    leaveTrigger.addEventListener('click', () => room.close(), { once: true });
-
-    function onClickSend() {
-      // Send message to all of the peers in the room via websocket
-      room.send(localText.value);
-
-      messages.textContent += `${peer.id}: ${localText.value}\n`;
-      localText.value = '';
-    }
-  });
-
-  peer.on('error', console.error);
-})();
+    $('#console').text('');
+}
