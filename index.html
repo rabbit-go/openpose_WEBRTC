@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
     <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <!--<link href="style.css" rel="stylesheet" type="text/css">-->
 </head>
 
@@ -15,8 +15,6 @@
     <p>Your ID: <strong><span id="my-id">...</span></strong></p>
     <div id="peerid-ui">
         <p>select your id</p>
-        <button type="button" id="twincam">Twincam</button>
-        <button type="button" id="user">User</button>
         <button type="button" id="sender">Sender</button>
         <button type="button" id="reciever">Reciever</button>
     </div>
@@ -38,7 +36,11 @@
         <br />
         <p id="console"></p>
     </div>
-    <br />
+    <br/>
+    <div>
+      <br>
+      <video id="js-local-stream" ></video>
+    </div>
     <div>
         <button type="button" id="reload">Reload</button>
     </div>

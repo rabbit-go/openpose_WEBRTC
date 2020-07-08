@@ -11,7 +11,7 @@ function GetPeerId(id) {
     peer = new Peer(id, {
         // Set API key for cloud server (you don't need this if you're running your
         // own.
-        key: '6cee6718-08d3-4ce7-93a9-237ecd4601bb',
+        key: window.__SKYWAY_KEY__,
         // Set highest debug level (log everything!).
         debug: 3,
     });
