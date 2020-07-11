@@ -72,8 +72,8 @@ function detectPoseInRealTime(video, net) {
             }
             
             // keypoints[9]には左手、keypoints[10]には右手の予測結果が格納されている 
-            console.log(keypoints[9]);
-            console.log(keypoints[10]);
+           // console.log(keypoints[9]);
+            //console.log(keypoints[10]);
         });
         poses.forEach(({score, keypoints}) => {
           if (score >= minPoseConfidence) {
