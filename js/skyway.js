@@ -100,8 +100,10 @@ $('#reload').on('click', () => {
 window.DataSend = DataSend;
 //送信処理
 function DataSend(msg) {
-    existingConn.send(msg);
-    $("#resultSend").text(msg);
+    if(existingConn!=null){
+        existingConn.send(msg);
+        $("#resultSend").text(msg);
+    }
 }
 
 //接続イベントの管理

@@ -1,22 +1,35 @@
 const imageScaleFactor = 0.2;
 const outputStride = 16;
-const flipHorizontal = false;
+const flipHorizontal = true;
 const stats = new Stats();
-const contentWidth = 800;
-const contentHeight = 600;
-
+const contentWidth = 600;
+const contentHeight = 500;
+const minPartConfidence = 0.4;
+const minPoseConfidence = 0.1;
+const guiState = {
+  output: {
+    showVideo: true,
+    showSkeleton: true,
+    showPoints: true,
+    showBoundingBox: false,
+  },
+  net: null,
+};
 bindPage();
 
 async function bindPage() {
     const net = await posenet.load({
         architecture: 'ResNet50',
         outputStride: 32,
-        inputResolution: { width: 257, height: 200 },
+        inputResolution: { width: contentWidth, height: contentHeight },
         quantBytes: 2
       });
+      const loadingDivId = 'loading', mainDivId = 'main'
+      document.getElementById(loadingDivId).style.display = 'none';
+      document.getElementById(mainDivId).style.display = 'block';
     let video;
     try {
-        video = document.getElementById('js-local-stream');// video属性をロード
+        video = document.getElementById('video');// video属性をロード
     } catch(e) {
         console.error(e);
         return;
@@ -33,15 +46,15 @@ async function bindPage() {
 // 取得したストリームをestimateSinglePose()に渡して姿勢予測を実行
 // requestAnimationFrameによってフレームを再描画し続ける
 function detectPoseInRealTime(video, net) {
-    const canvas = document.getElementById('canvas');
+    const canvas = document.getElementById('output');
     const ctx = canvas.getContext('2d');
-    const flipHorizontal = false; // since images are being fed from a webcam
 
     async function poseDetectionFrame() {
         stats.begin();
-        let poses = [];
-        const pose = await net.estimateSinglePose(video, imageScaleFactor, flipHorizontal, outputStride);
-        poses.push(pose);
+        const poses = await net.estimatePoses(video, {
+          flipHorizontal: flipHorizontal,
+          decodingMethod: 'single-person'
+        });
 
         ctx.clearRect(0, 0, contentWidth,contentHeight);
 
@@ -52,6 +65,7 @@ function detectPoseInRealTime(video, net) {
         ctx.restore();
         
         poses.forEach(({ score, keypoints }) => {
+            
             if(window.DataSend!=undefined){
                 window.DataSend(keypoints[9]);
                 window.DataSend(keypoints[10]);
@@ -61,7 +75,19 @@ function detectPoseInRealTime(video, net) {
             console.log(keypoints[9]);
             console.log(keypoints[10]);
         });
-
+        poses.forEach(({score, keypoints}) => {
+          if (score >= minPoseConfidence) {
+            if (guiState.output.showPoints) {
+              window.drawKeypoints(keypoints, minPartConfidence, ctx);
+            }
+            if (guiState.output.showSkeleton) {
+              window.drawSkeleton(keypoints, minPartConfidence, ctx);
+            }
+            if (guiState.output.showBoundingBox) {
+              window.drawBoundingBox(keypoints, ctx);
+            }
+          }
+        });
         stats.end();
 
         requestAnimationFrame(poseDetectionFrame);

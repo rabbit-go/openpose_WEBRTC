@@ -9,7 +9,7 @@ async function loadVideo() {
 // カメラのセットアップ
 // video属性からストリームを取得する
 async function setupCamera() {
-    const video = document.getElementById('js-local-stream');
+    const video = document.getElementById('video');
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         const stream = await navigator.mediaDevices.getUserMedia({
             'audio': false,
