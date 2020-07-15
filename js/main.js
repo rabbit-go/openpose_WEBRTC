@@ -53,6 +53,7 @@ function detectPoseInRealTime(video, net) {
         stats.begin();
         const poses = await net.estimatePoses(video, {
           flipHorizontal: flipHorizontal,
+          imageScaleFactor: 0.3,
           decodingMethod: 'single-person'
         });
 
