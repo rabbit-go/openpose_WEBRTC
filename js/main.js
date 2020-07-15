@@ -18,11 +18,17 @@ const guiState = {
 bindPage();
 
 async function bindPage() {
-    const net = await posenet.load({
+    /*const net = await posenet.load({
         architecture: 'ResNet50',
         outputStride: 32,
         inputResolution: { width: contentWidth, height: contentHeight },
         quantBytes: 2
+      });*/
+      const net = await posenet.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        inputResolution: { width: contentWidth, height: contentHeight },
+        multiplier: 0.75
       });
       const loadingDivId = 'loading', mainDivId = 'main'
       document.getElementById(loadingDivId).style.display = 'none';
