@@ -19,7 +19,6 @@ function GetPeerId(id) {
     // Show this peer's ID.
     peer.on('open', id => {
         $('#my-id').text(id);
-        isOpen = true;
     });
 
     //着信処理
@@ -122,6 +121,7 @@ function Connect(conn) {
     //接続が完了した場合のイベント
     conn.on('open', () => {
         $('#connected-id').text(conn.remoteId);
+        isOpen = true;
     });
 
     //受信
