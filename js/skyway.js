@@ -1,6 +1,6 @@
 let peer = null;
 let existingConn = null;
-
+var isOpen = false;
 //初期化(cssでもできるはず)
 SetupMakeConnUI();
 
@@ -19,14 +19,17 @@ function GetPeerId(id) {
     // Show this peer's ID.
     peer.on('open', id => {
         $('#my-id').text(id);
+        isOpen = true;
     });
 
     //着信処理
     peer.on('connection', Connect);
+    peer.on('close', id =>{isOpen = false;});
 
     //エラー
     peer.on('error', err => {
         $('#console').text(err);
+        isOpen = false;
         SetupMakeConnUI();
     });
 
@@ -100,7 +103,7 @@ $('#reload').on('click', () => {
 window.DataSend = DataSend;
 //送信処理
 function DataSend(msg) {
-    if(existingConn!=null){
+    if(existingConn!=null && isOpen){
         existingConn.send(msg);
         $("#resultSend").text(msg);
     }
